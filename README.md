@@ -2,6 +2,7 @@
 
 A tutorial for Inverse Kinematics (IK) for generic robots.
 
+## PINK
 In this tutorial, we will go through Pink IK software.
 
 **P**ython **in**verse **k**inematics for articulated robot models, based on [Pinocchio](https://github.com/stack-of-tasks/pinocchio).
@@ -150,76 +151,203 @@ Inverse kinematics (IK) is the problem of computing a motion **q(t)** in the rob
 
 The problems of forward and inverse kinematics relate configuration-space and workspace coordinates:
 
-- **Forward kinematics**: compute workspace motions **x(t)** resulting from a configuration-space motion **q(t)**. Writing **FK** this mapping,  
-  **x(t) = FK(q(t))**.
+- **Forward kinematics**: compute workspace motions **x(t)** resulting from a configuration-space motion **q(t)**. Writing **FK** this mapping,
 
-- **Inverse kinematics**: compute a configuration-space motion **q(t)** so as to achieve a set of body motions **x(t)**. If the mapping **FK** were invertible, we would have  
-  **q(t) = FK⁻¹(x(t))**.
+$$
+x(t) = FK(q(t))
+$$
 
-However, the mapping **FK** is not always invertible due to **kinematic redundancy**: there may be infinitely many ways to achieve a given set of tasks. For example, if there are only two tasks **x = (x_lf, x_rf)** to keep left and right foot frames at a constant location on the ground, the humanoid can move its upper body while keeping its legs in the same configuration. In this post, we will see a common solution for inverse kinematics where redundancy is used achieve multiple tasks at once.
+- **Inverse kinematics**: compute a configuration-space motion **q(t)** so as to achieve a set of body motions **x(t)**. If the mapping **FK** were invertible, we would have
+
+$$
+q(t) = FK^{-1}(x(t))
+$$
+
+However, the mapping **FK** is not always invertible due to **kinematic redundancy**: there may be infinitely many ways to achieve a given set of tasks. For example, if there are only two tasks **x = (x_{lf}, x_{rf})** to keep left and right foot frames at a constant location on the ground, the humanoid can move its upper body while keeping its legs in the same configuration. In this post, we will see a common solution for inverse kinematics where redundancy is used achieve multiple tasks at once.
 
 #### Kinematic task
 ---
 Let us consider the task of bringing a point **p** located on one of the robot’s links, to a goal position **p\***, both point coordinates being expressed in the world frame. When the robot is in configuration **q**, the (position) residual of this task is:
 
-\[
+$$
 r(q) = p^* - p(q)
-\]
+$$
 
 The goal of the task is to bring this residual to zero. Next, from forward kinematics we know how to compute the Jacobian matrix of **p**:
 
-\[
-J(q) = \frac{\partial p}{\partial q}(q),
-\]
+$$
+J(q) = \frac{\partial p}{\partial q}(q)
+$$
 
-which maps joint velocities **\dot{q}** to end-point velocities **\dot{p}** via  
-\[
-J(q)\dot{q} = \dot{p}.
-\]
+which maps joint velocities **$\dot{q}$** to end-point velocities **$\dot{p}$** via
 
-Suppose that we apply a velocity **\dot{q}** over a small duration **\delta t**. The new residual after **\delta t** is  
-\[
-r' = r - \dot{p}\delta t.
-\]
+$$
+J(q)\dot{q} = \dot{p}
+$$
 
-Our goal is to cancel it, that is  
-\[
-r' = 0 \;\Leftrightarrow\; \dot{p}\delta t = r,
-\]
+Suppose that we apply a velocity **$\dot{q}$** over a small duration **$\delta t$**. The new residual after **$\delta t$** is
+
+$$
+r' = r - \dot{p}\delta t
+$$
+
+Our goal is to cancel it, that is
+
+$$
+r' = 0 \;\Leftrightarrow\; \dot{p}\delta t = r
+$$
+
 which leads us to define the velocity residual:
 
-\[
+$$
 v(q, \delta t) \stackrel{\text{def}}{=} \frac{r(q)}{\delta t} = \frac{p^* - p(q)}{\delta t}
-\]
+$$
 
-The best option is then to select **\dot{q}** such that:
+The best option is then to select **$\dot{q}$** such that:
 
-\[
+$$
 J(q)\dot{q} = \dot{p} = v(q, \delta t)
-\]
+$$
 
-If the Jacobian were invertible, we could take  
-\[
-\dot{q} = J^{-1}v.
-\]
+If the Jacobian were invertible, we could take
+
+$$
+\dot{q} = J^{-1}v
+$$
 
 However, that’s usually not the case (think of a point task where **J** has three rows and one column per DOF). The best solution that we can get in the least-square sense is the solution to:
 
-\[
-\min_{\dot{q}} \lVert J\dot{q} - v \rVert^2,
-\]
+$$
+\min_{\dot{q}} \lVert J\dot{q} - v \rVert^2
+$$
 
-and is given by the pseudo-inverse **J†** of **J**:
+and is given by the pseudo-inverse **$J^\dagger$** of **J**:
 
-\[
-\dot{q} = J^{\dagger}v.
-\]
+$$
+\dot{q} = J^\dagger v
+$$
 
-By writing this equivalently as  
-\[
-(J^T J)\dot{q} = J^T v,
-\]
-we see that this approach is exactly the **Gauss-Newton algorithm**. (There is a sign difference compared with the Gauss-Newton update rule, which comes from our use of the end-effector Jacobian **\partial p / \partial q** rather than the residual Jacobian **\partial r / \partial q**.)
+By writing this equivalently as
+
+$$
+(J^T J)\dot{q} = J^T v
+$$
+
+we see that this approach is exactly the **Gauss-Newton algorithm**. (There is a sign difference compared with the Gauss-Newton update rule, which comes from our use of the end-effector Jacobian **$\partial p / \partial q$** rather than the residual Jacobian **$\partial r / \partial q$**.)
+
+#### Task gains
+---
+For this solution to work, the time step **$\delta t$** should be sufficiently small, so that the variations of the Jacobian term between **$q$** and **$q + \dot{q}\delta t$** can be neglected. The total variation is
+
+$$
+J(q + \dot{q}\delta t)\dot{q} - J(q)\dot{q} = \delta t\, \dot{q}^T H(q)\dot{q}
+$$
+
+where **$H(q)$** is the *Hessian* matrix of the task. This matrix is more expensive to compute than **$J$**. Rather than checking that the variation above is small enough, a *common practice* is to multiply the velocity residual by a proportional gain **$K_p \in [0, 1]$**:
+
+$$
+J(q)\dot{q} = K_p v
+$$
+
+For example, **$K_p = 0.5$** means that the system will (try at best to) cut the residual by half at each time step **$\delta t$**. Adding this gain does not change the exponential convergence to the solution **$r = 0$**, and helps avoid *overshooting* of the real solution. When you observe instabilities in your IK tracking, reducing task gains is usually a good idea.
+
+#### Multiple tasks
+---
+So far, we have seen what happens for a single task, but redundant systems like humanoid robots need to achieve multiple tasks at once (moving feet from contact to contact, following with the center of mass, regulating the angular momentum, etc.) A common practice to combine tasks is weighted combination. We saw that a task *i* can be seen as minimizing $\lVert J_i \dot{q} - K_i v_i \rVert^2$. Then, by associating a weight $w_i$ to each task, the IK problem becomes:
+
+$$
+\min_{\dot{q}} \sum_{\text{task } i} w_i \lVert J_i \dot{q} - K_i v_i \rVert^2
+$$
+
+The solution to this problem can again be computed by pseudo-inverse or using a quadratic programming (QP) solver. This formulation has *some convergence properties*, but its solutions are always a *compromise* between tasks, which can be a problem in practice. For example, when a humanoid tries to make three contacts while it is only possible to make at most two, the solution found by a weighted combination will be somewhere “in the middle” and achieve no contact at all.
+
+<div align="center">
+  <img src="media/humanoid.png" width="400">
+</div>
+
+
+In practice, we can set implicit priorities between tasks by having e.g. $w_i = 10^4$ for the most important task, $w_j = 10^2$ for the next one, etc. This is for instance how the **pymanoid** IK is used in **this paper**. This solution emulates the behavior of a **hierarchical quadratic program (HQP)** (unfortunately, there has been no open source HQP solver available as of 2016–2021). See this **talk by Wieber (2015)** for a deeper overview of the question.
+
+#### Inequality constraints
+
+Last but not least, we need to enforce a number of inequality constraints to avoid solutions that violate e.g. joint limits. The overall IK problem becomes:
+
+$$
+\min_{\dot{q}} \sum_{\text{task } i} w_i \lVert J_i \dot{q} - K_i v_i \rVert^2
+$$
+
+subject to
+
+$$
+\dot{q}^- \le \dot{q} \le \dot{q}^+
+$$
+
+Inequalities between vectors being taken componentwise. This time, the pseudo-inverse solution cannot be applied (as it doesn’t handle inequalities), but it is still possible to use a QP solver, such as **CVXOPT** or **quadprog** in Python. These solvers work on problems with a quadratic cost function and linear inequalities:
+
+$$
+\min_x \; (1/2)\, x^T P x + r^T x
+$$
+
+subject to
+
+$$
+Gx \le h
+$$
+
+The weighted IK problem falls under this framework.
+
+##### Cost function
+
+Consider one of the squared norms in the task summation:
+
+$$
+\lVert J_i \dot{q} - K_i v_i \rVert^2
+= (J_i \dot{q} - K_i v_i)^T (J_i \dot{q} - K_i v_i)
+$$
+
+$$
+= \dot{q}^T J_i^T J_i \dot{q} - K_i v_i^T J_i \dot{q} - K_i \dot{q}^T J_i^T v_i + K_i^2 v_i^T v_i
+$$
+
+$$
+= \dot{q}^T (J_i^T J_i)\dot{q} - 2 (K_i v_i^T J_i)\dot{q} + K_i^2 v_i^T v_i
+$$
+
+where we used the fact that, for any real number $x$, $x^T = x$. As the term in $v_i^T v_i$ does not depend on $\dot{q}$, the minimum of the squared norm is the same as the minimum of $(1/2)\dot{q}^T P_i \dot{q} + r_i^T \dot{q}$ with $P_i = J_i^T J_i$ and $r_i = -K_i v_i^T J_i$. The pair $(P, r)$ for the weighted IK problem is finally $P = \sum_i w_i P_i$ and $r = \sum_i w_i r_i$.
+
+#### Joint limits
+---
+There are two types of joint limits we can take into account in first-order differential inverse kinematics: joint velocity and joint-angle limits.
+
+Since we solve a problem in **$\dot{q}$**, velocity limits can be directly written as **$G\dot{q} \le h$** where **$G$** stacks the matrices **$+E_3$** and **$-E_3$**, while **$h$** stacks the corresponding vectors **$\dot{q}^+$** and **$-\dot{q}^-$**. In practice, joint velocities are often symmetric, so that **$\dot{q}^+ = \dot{q}_{\max}$** and **$\dot{q}^- = -\dot{q}_{\max}$**, and **$h$** stacks **$\dot{q}_{\max}$** twice.
+
+Next, we want to implement limits on joint angles **$q^- \le q \le q^+$** so that the robot stays within its mechanical range of motion. A solution for this is to add velocity bounds:
+
+$$
+\dot{q}^- = K_{\text{lim}} \frac{q^- - q}{\delta t}
+$$
+
+$$
+\dot{q}^+ = K_{\text{lim}} \frac{q^+ - q}{\delta t}
+$$
+
+where **$K_{\text{lim}} \in [0, 1]$** is a proportional gain. For example, a value of **$K_{\text{lim}} = 0.5$** means that a joint angle update will not exceed half the gap separating its current value from its bounds (**Kanoun, 2011**).
+
+#### To go further
+
+The differential inverse kinematics formulation we have seen here is implemented in Python in **Pink** (based on Pinocchio) as well as in **mink** (based on MuJoCo) by Kevin Zakka. Both libraries comes with a number of examples for manipulators, humanoids, quadrupeds, robotic hands, ... Alternatively to forming a quadratic program (with worst-case complexity cubic in the number of parameters), it is also possible to solve differential IK directly on the kinematic tree with linear time-complexity. This alternative is implemented in the **LoIK** open-source library. It solves problems faster than QP solvers, but it only applies to single-body tasks (e.g. no center-of-mass task).
+
+#### Levenberg-Marquardt damping
+
+One efficient technique to make the IK more numerically stable is to add **Levenberg-Marquardt damping**, an extension of Thikonov regularization where the damping matrix is chosen proportional to the task error. This strategy is implemented e.g. by the **BodyTask** of Pink. See (**Sugihara, 2011**) for a deeper dive.
+
+#### Second-order differential IK
+
+Differential IK at the acceleration level (second order) has been more common than first order version we have seen in this note. It can be found for instance in the **Tasks** library, which powered ladder-climbing by an **HRP-2 humanoid robot**, as well as in the **TSID** open-source library.
+
+#### History of the expression “inverse kinematics”
+
+Thirty-five years ago (**Richard, 1981**), “inverse kinematics” was defined as the problem of finding joint angles **q** fulfilling a set of tasks **g(q) = 0**, which is a fully geometric problem. (A better name for it could have been "inverse geometry", considering that *kinematics* which means motion and that this problem does not involve motion.) Various solutions were proposed to approach this question, the most widely reproduced idea being to compute successive velocities that bring the robot, step by step, closer to fulfilling **g(q) = 0**. This approach was called “differential inverse kinematics” (**Nakamura, 1990**) to distinguish it from the existing “inverse kinematics” name. (A better name for it could have been, well, "inverse kinematics", since it does involve motion!)
 
 
 
