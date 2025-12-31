@@ -1,8 +1,10 @@
-# Inverse Kinematic (IK) Tutorial
+# Pink
 
-A tutorial for Inverse Kinematics (IK) for generic robots.
-
-In this tutorial, we will go through Pink IK software.
+[![Build](https://img.shields.io/github/actions/workflow/status/stephane-caron/pink/ci.yml?branch=main)](https://github.com/stephane-caron/pink/actions)
+[![Documentation](https://img.shields.io/github/actions/workflow/status/stephane-caron/pink/docs.yml?branch=main&label=docs)](https://stephane-caron.github.io/pink/)
+[![Coverage](https://coveralls.io/repos/github/stephane-caron/pink/badge.svg?branch=main)](https://coveralls.io/github/stephane-caron/pink?branch=main)
+[![Conda version](https://anaconda.org/conda-forge/pink/badges/version.svg)](https://anaconda.org/conda-forge/pink)
+[![PyPI version](https://img.shields.io/pypi/v/pin-pink)](https://pypi.org/project/pin-pink/)
 
 **P**ython **in**verse **k**inematics for articulated robot models, based on [Pinocchio](https://github.com/stack-of-tasks/pinocchio).
 
@@ -141,88 +143,6 @@ There are also more basic examples to get started:
 
 Check out the [examples](https://github.com/stephane-caron/pink/tree/main/examples) directory for more.
 
-
-## Description
-### Differential Inverse Kinematics
-#### Introduction
----
-Inverse kinematics (IK) is the problem of computing a motion **q(t)** in the robot configuration space (e.g. joint angle coordinates) that achieves a desired motion in **task or workspace coordinates x(t)**. A task *i* can be, for instance, to put a foot on a surface, or to move the center of mass (CoM) of the robot to a target location. Tasks are then collectively defined by a set **x = (x₁, …, xₙ)** of points or frames attached to the robot, with for instance **x₁** the CoM, **x₂** the center of the right foot sole, etc.
-
-The problems of forward and inverse kinematics relate configuration-space and workspace coordinates:
-
-- **Forward kinematics**: compute workspace motions **x(t)** resulting from a configuration-space motion **q(t)**. Writing **FK** this mapping,  
-  **x(t) = FK(q(t))**.
-
-- **Inverse kinematics**: compute a configuration-space motion **q(t)** so as to achieve a set of body motions **x(t)**. If the mapping **FK** were invertible, we would have  
-  **q(t) = FK⁻¹(x(t))**.
-
-However, the mapping **FK** is not always invertible due to **kinematic redundancy**: there may be infinitely many ways to achieve a given set of tasks. For example, if there are only two tasks **x = (x_lf, x_rf)** to keep left and right foot frames at a constant location on the ground, the humanoid can move its upper body while keeping its legs in the same configuration. In this post, we will see a common solution for inverse kinematics where redundancy is used achieve multiple tasks at once.
-
-#### Kinematic task
----
-Let us consider the task of bringing a point **p** located on one of the robot’s links, to a goal position **p\***, both point coordinates being expressed in the world frame. When the robot is in configuration **q**, the (position) residual of this task is:
-
-\[
-r(q) = p^* - p(q)
-\]
-
-The goal of the task is to bring this residual to zero. Next, from forward kinematics we know how to compute the Jacobian matrix of **p**:
-
-\[
-J(q) = \frac{\partial p}{\partial q}(q),
-\]
-
-which maps joint velocities **\dot{q}** to end-point velocities **\dot{p}** via  
-\[
-J(q)\dot{q} = \dot{p}.
-\]
-
-Suppose that we apply a velocity **\dot{q}** over a small duration **\delta t**. The new residual after **\delta t** is  
-\[
-r' = r - \dot{p}\delta t.
-\]
-
-Our goal is to cancel it, that is  
-\[
-r' = 0 \;\Leftrightarrow\; \dot{p}\delta t = r,
-\]
-which leads us to define the velocity residual:
-
-\[
-v(q, \delta t) \stackrel{\text{def}}{=} \frac{r(q)}{\delta t} = \frac{p^* - p(q)}{\delta t}
-\]
-
-The best option is then to select **\dot{q}** such that:
-
-\[
-J(q)\dot{q} = \dot{p} = v(q, \delta t)
-\]
-
-If the Jacobian were invertible, we could take  
-\[
-\dot{q} = J^{-1}v.
-\]
-
-However, that’s usually not the case (think of a point task where **J** has three rows and one column per DOF). The best solution that we can get in the least-square sense is the solution to:
-
-\[
-\min_{\dot{q}} \lVert J\dot{q} - v \rVert^2,
-\]
-
-and is given by the pseudo-inverse **J†** of **J**:
-
-\[
-\dot{q} = J^{\dagger}v.
-\]
-
-By writing this equivalently as  
-\[
-(J^T J)\dot{q} = J^T v,
-\]
-we see that this approach is exactly the **Gauss-Newton algorithm**. (There is a sign difference compared with the Gauss-Newton update rule, which comes from our use of the end-effector Jacobian **\partial p / \partial q** rather than the residual Jacobian **\partial r / \partial q**.)
-
-
-
 ## Frequently Asked Questions
 
 - [Can I solve **global** inverse kinematics?](https://github.com/stephane-caron/pink/discussions/66#discussioncomment-8224315)
@@ -233,6 +153,24 @@ we see that this approach is exactly the **Gauss-Newton algorithm**. (There is a
 
 Pink implements differential inverse kinematics, a first-order algorithm that converges to the closest optimum of its cost function. It is a **local** method that does not solve the more difficult problem of [global inverse kinematics](https://github.com/stephane-caron/pink/discussions/66). That is, it may converge to a global optimum, or to a local one stuck to some configuration limits. This behavior is illustrated in the [simple pendulum with configuration limit](https://github.com/stephane-caron/pink/blob/main/examples/simple_pendulum_configuration_limit.py) example.
 
+## How can I help?
+
+Install the library and use it! Report bugs in the [issue tracker](https://github.com/stephane-caron/pink/issues). If you are a developer with some robotics experience looking to hack on open source, check out the [contribution guidelines](CONTRIBUTING.md).
+
+## Citation
+
+If you use Pink in your scientific works, please cite it *e.g.* as follows:
+
+```bibtex
+@software{pink,
+  title = {{Pink: Python inverse kinematics based on Pinocchio}},
+  author = {Caron, Stéphane and De Mont-Marin, Yann and Budhiraja, Rohan and Bang, Seung Hyeon and Domrachev, Ivan and Nedelchev, Simeon and Du, Peter and Escande, Adrien and Vaillant, Joris and Wingo, Bruce},
+  license = {Apache-2.0},
+  url = {https://github.com/stephane-caron/pink},
+  version = {3.5.0},
+  year = {2025}
+}
+```
 
 Don't forget to add yourself to the BibTeX above and to `CITATION.cff` if you contribute to this repository.
 
@@ -251,4 +189,3 @@ Technical notes:
 - [Inverse kinematics](https://scaron.info/robotics/inverse-kinematics.html): a general introduction to differential inverse kinematics.
 - [Jacobian of a kinematic task and derivatives on manifolds](https://scaron.info/robotics/jacobian-of-a-kinematic-task-and-derivatives-on-manifolds.html).
 - [Control Barrier Functions](https://simeon-ned.com/blog/2024/cbf/).
-
