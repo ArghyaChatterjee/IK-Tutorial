@@ -1,3 +1,3 @@
-# Forward (FK) and Inverse Kinematic (IK) Inspector
+# Inverse Kinematic (IK) Inspector
 
 A repository for Forward and Inverse Kinematic Inspector for generic robots.
