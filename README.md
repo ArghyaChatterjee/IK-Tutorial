@@ -2,8 +2,8 @@
 
 A tutorial for Inverse Kinematics (IK) for generic robots.
 
-## PINK
-In this tutorial, we will go through Pink IK software.
+## Pink
+In this tutorial, we will go through Pink IK software. The version of Pink used here is 3.5.0.
 
 **P**ython **in**verse **k**inematics for articulated robot models, based on [Pinocchio](https://github.com/stack-of-tasks/pinocchio).
 
