@@ -1,0 +1,4 @@
+pin-pink==3.5.0
+robot_descriptions==1.22.0
+daqp==0.7.2
+meshcat==0.3.2

@@ -1,6 +1,6 @@
 # Inverse Kinematic (IK) Tutorial
 
-A tutorial for Inverse Kinematics (IK) for generic robots.
+A tutorial for Inverse Kinematics (IK) using Pinocchio and QP solvers. 
 
 ## Pink
 In this tutorial, we will go through Pink IK software. The version of Pink used here is 3.5.0.
@@ -9,19 +9,57 @@ In this tutorial, we will go through Pink IK software. The version of Pink used 
 
 ![Banner for Pink v0.5.0](https://user-images.githubusercontent.com/1189580/192318997-ed7574c3-8238-451d-9548-a769d46ec03b.png)
 
+## Requirements
+This work was performed on ubuntu 22.04, Cuda 12.8, Python 3.10, Nvidia RTX 3060 and Pink 3.5.0.
+
+## Clone the repo
+Clone the repo using the following command:
+```
+git clone https://github.com/ArghyaChatterjee/IK-Tutorial.git
+cd IK-Tutorial
+```
+
 ## Installation
 
 For best performance we recommended installing Pink from Conda:
 
 ```console
+source ~/miniconda3/bin/activate
+conda create -n pink_env python=3.10
 conda install -c conda-forge pink
 ```
 
-You can also install it from PyPI:
+You can also install Pink in a virtual environment:
 
 ```console
-pip install pin-pink
+python3 -m venv pink_venv
+source pink_venv/bin/activate
+pip3 install --upgrade pip
+pip3 install -r requirements.txt
 ```
+
+## Example
+Navigate to the examples directory:
+```
+cd pink/examples
+```
+Run the draco humanoid robot:
+```
+python3 humanoid_draco3.py
+```
+
+<div align="center">
+  <img src="media/humanoid_ik.png" width="400">
+</div>
+
+Run the UR3 arm:
+```
+python3 arm_ur3.py
+```
+
+<div align="center">
+  <img src="media/ur3_ik.png" width="400">
+</div>
 
 ## Usage
 
