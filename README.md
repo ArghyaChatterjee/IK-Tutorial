@@ -126,13 +126,14 @@ uv run examples/humanoid_apollo.py
 ## Other Examples
 Find examples for different robots:
 
-* **Single arms**: [Franka Panda](https://github.com/kevinzakka/mink/blob/main/examples/arm_panda.py), [UR5e](https://github.com/kevinzakka/mink/blob/main/examples/arm_ur5e.py), [KUKA iiwa14](https://github.com/kevinzakka/mink/blob/main/examples/arm_iiwa.py), [ALOHA 2](https://github.com/kevinzakka/mink/blob/main/examples/arm_aloha.py)
-* **Dual arms**: [Dual Panda](https://github.com/kevinzakka/mink/blob/main/examples/dual_panda.py), [Dual iiwa14](https://github.com/kevinzakka/mink/blob/main/examples/dual_iiwa.py), [Flying Dual UR5e](https://github.com/kevinzakka/mink/blob/main/examples/flying_dual_arm_ur5e.py)
-* **Arm + hand**: [iiwa14 + Allegro](https://github.com/kevinzakka/mink/blob/main/examples/arm_hand_iiwa_allegro.py), [xArm + LEAP](https://github.com/kevinzakka/mink/blob/main/examples/arm_hand_xarm_leap.py)
-* **Dexterous hands**: [Shadow Hand](https://github.com/kevinzakka/mink/blob/main/examples/hand_shadow.py)
-* **Humanoids**: [Unitree G1](https://github.com/kevinzakka/mink/blob/main/examples/humanoid_g1.py), [Unitree H1](https://github.com/kevinzakka/mink/blob/main/examples/humanoid_h1.py), [Apptronik Apollo](https://github.com/kevinzakka/mink/blob/main/examples/humanoid_apollo.py)
-* **Legged robots**: [Unitree Go1](https://github.com/kevinzakka/mink/blob/main/examples/quadruped_go1.py), [Boston Dynamics Spot](https://github.com/kevinzakka/mink/blob/main/examples/quadruped_spot.py), [Agility Cassie](https://github.com/kevinzakka/mink/blob/main/examples/biped_cassie.py)
-* **Mobile manipulators**: [TidyBot](https://github.com/kevinzakka/mink/blob/main/examples/mobile_tidybot.py), [Hello Robot Stretch](https://github.com/kevinzakka/mink/blob/main/examples/mobile_stretch.py), [Kinova Gen3 + LEAP](https://github.com/kevinzakka/mink/blob/main/examples/mobile_kinova_leap.py)
+* **Single arms**: [Franka Panda](./mink/examples/arm_panda.py), [UR5e](./mink/examples/arm_ur5e.py), [KUKA iiwa14](./mink/examples/arm_iiwa.py), [ALOHA 2](./mink/examples/arm_aloha.py)
+* **Dual arms**: [Dual Panda](./mink/examples/dual_panda.py), [Dual iiwa14](./mink/examples/dual_iiwa.py), [Flying Dual UR5e](./mink/examples/flying_dual_arm_ur5e.py)
+* **Arm + hand**: [iiwa14 + Allegro](./mink/examples/arm_hand_iiwa_allegro.py), [xArm + LEAP](./mink/examples/arm_hand_xarm_leap.py)
+* **Dexterous hands**: [Shadow Hand](./mink/examples/hand_shadow.py)
+* **Humanoids**: [Unitree G1](./mink/examples/humanoid_g1.py), [Unitree H1](./mink/examples/humanoid_h1.py), [Apptronik Apollo](./mink/examples/humanoid_apollo.py)
+* **Legged robots**: [Unitree Go1](./mink/examples/quadruped_go1.py), [Boston Dynamics Spot](./mink/examples/quadruped_spot.py), [Agility Cassie](./mink/examples/biped_cassie.py)
+* **Mobile manipulators**: [TidyBot](./mink/examples/mobile_tidybot.py), [Hello Robot Stretch](./mink/examples/mobile_stretch.py), [Kinova Gen3 + LEAP](./mink/examples/mobile_kinova_leap.py)
+
 
 
 ## Usage
@@ -449,5 +450,5 @@ Thirty-five years ago (**Richard, 1981**), “inverse kinematics” was defined 
 
 ## Global inverse kinematics
 
-Pink implements differential inverse kinematics, a first-order algorithm that converges to the closest optimum of its cost function. It is a **local** method that does not solve the more difficult problem of [global inverse kinematics](https://github.com/stephane-caron/pink/discussions/66). That is, it may converge to a global optimum, or to a local one stuck to some configuration limits. This behavior is illustrated in the [simple pendulum with configuration limit](https://github.com/stephane-caron/pink/blob/main/examples/simple_pendulum_configuration_limit.py) example.
+Pink implements differential inverse kinematics, a first-order algorithm that converges to the closest optimum of its cost function. It is a **local** method that does not solve the more difficult problem of [global inverse kinematics](https://github.com/stephane-caron/pink/discussions/66). That is, it may converge to a global optimum, or to a local one stuck to some configuration limits. This behavior is illustrated in the [simple pendulum with configuration limit](./pink/examples/simple_pendulum_configuration_limit.py) example.
 
