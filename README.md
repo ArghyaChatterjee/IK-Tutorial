@@ -63,6 +63,29 @@ python3 arm_ur3.py
   <img src="media/ur3_ik.png" width="400">
 </div>
 
+## Other Examples:
+
+Illustrated examples showcase how Pink performs on various robot morphologies:
+
+* Arm: [UR5](./pink/examples#arm-ur5) and [UR5 with end-effector limits](./pink/examples/barriers#arm-ur5)
+* Dual arms: [Flying dual-arm UR3](./pink/examples#flying-dual-arm-ur3)
+* Dual arms: [Yumi with spherical self-collision avoidance](./pink/examples/barriers#yumi-end-effector-self-collision-avoidance)
+* Dual arms: [Iiwa with whole-body self-collision avoidance](./pink/examples/barriers#iiwa-whole-body-collision-avoidance)
+* Humanoid: [Draco 3](./pink/examples#humanoid-draco-3)
+* Mobile base: [Stretch R1](./pink/examples#mobile-stretch)
+* Quadruped: [Go2 squatting with floating-base limits](./pink/examples/barriers#go2-squat)
+* Wheeled biped: [Upkie rolling without slipping](./pink/examples#wheeled-biped-upkie)
+
+There are also more basic examples to get started:
+
+* [Double pendulum](./pink/examples/double_pendulum.py)
+* [Loading a custom URDF](./pink/examples/load_custom_urdf.py)
+* [Visualization in MeshCat](./pink/examples/visualize_in_meshcat.py)
+* [Visualization in yourdfpy](./pink/examples/visualize_in_yourdfpy.py)
+
+Check out the [examples](./pink/examples) directory for more.
+
+
 # Mink
 **M**ujoco **in**verse **k**inematics for articulated robot models, based on Mujoco physics engine. Mink is running Pink under the hood.
 
@@ -99,11 +122,22 @@ uv run examples/humanoid_apollo.py
   <img src="media/ik_apollo.gif" width="400">
 </div>
 
-You will find the other demos inside `examples` folder.
+
+## Other Examples
+Find examples for different robots:
+
+* **Single arms**: [Franka Panda](https://github.com/kevinzakka/mink/blob/main/examples/arm_panda.py), [UR5e](https://github.com/kevinzakka/mink/blob/main/examples/arm_ur5e.py), [KUKA iiwa14](https://github.com/kevinzakka/mink/blob/main/examples/arm_iiwa.py), [ALOHA 2](https://github.com/kevinzakka/mink/blob/main/examples/arm_aloha.py)
+* **Dual arms**: [Dual Panda](https://github.com/kevinzakka/mink/blob/main/examples/dual_panda.py), [Dual iiwa14](https://github.com/kevinzakka/mink/blob/main/examples/dual_iiwa.py), [Flying Dual UR5e](https://github.com/kevinzakka/mink/blob/main/examples/flying_dual_arm_ur5e.py)
+* **Arm + hand**: [iiwa14 + Allegro](https://github.com/kevinzakka/mink/blob/main/examples/arm_hand_iiwa_allegro.py), [xArm + LEAP](https://github.com/kevinzakka/mink/blob/main/examples/arm_hand_xarm_leap.py)
+* **Dexterous hands**: [Shadow Hand](https://github.com/kevinzakka/mink/blob/main/examples/hand_shadow.py)
+* **Humanoids**: [Unitree G1](https://github.com/kevinzakka/mink/blob/main/examples/humanoid_g1.py), [Unitree H1](https://github.com/kevinzakka/mink/blob/main/examples/humanoid_h1.py), [Apptronik Apollo](https://github.com/kevinzakka/mink/blob/main/examples/humanoid_apollo.py)
+* **Legged robots**: [Unitree Go1](https://github.com/kevinzakka/mink/blob/main/examples/quadruped_go1.py), [Boston Dynamics Spot](https://github.com/kevinzakka/mink/blob/main/examples/quadruped_spot.py), [Agility Cassie](https://github.com/kevinzakka/mink/blob/main/examples/biped_cassie.py)
+* **Mobile manipulators**: [TidyBot](https://github.com/kevinzakka/mink/blob/main/examples/mobile_tidybot.py), [Hello Robot Stretch](https://github.com/kevinzakka/mink/blob/main/examples/mobile_stretch.py), [Kinova Gen3 + LEAP](https://github.com/kevinzakka/mink/blob/main/examples/mobile_kinova_leap.py)
+
 
 ## Usage
 
-Pink solves differential inverse kinematics by [weighted tasks](https://scaron.info/robot-locomotion/inverse-kinematics.html). A task is defined by a *residual* function $e(q)$ of the robot configuration $q \in \mathcal{C}$ to be driven to zero. For instance, putting a foot position $p_{foot}(q)$ at a given target $p_{foot}^{\star}$ can be described by the position residual:
+Pink solves differential inverse kinematics by weighted tasks. A task is defined by a *residual* function $e(q)$ of the robot configuration $q \in \mathcal{C}$ to be driven to zero. For instance, putting a foot position $p_{foot}(q)$ at a given target $p_{foot}^{\star}$ can be described by the position residual:
 
 $$
 e(q) = p_{foot}^{\star} - p_{foot}(q)
@@ -115,7 +149,7 @@ $$
 J_e(q) v = \dot{e}(q) = -\alpha e(q)
 $$
 
-where $J\_e(q) := \frac{\partial e}{\partial q}$ is the [task Jacobian](https://scaron.info/robotics/jacobian-of-a-kinematic-task-and-derivatives-on-manifolds.html). We can define multiple tasks, but some of them will come into conflict if they can't be all fully achieved at the same time. Conflicts are resolved by casting all objectives to a common unit, and weighing these normalized objectives relative to each other. We also include configuration and velocity limits, making our overall optimization problem a quadratic program:
+where $J\_e(q) := \frac{\partial e}{\partial q}$ is the task Jacobian. We can define multiple tasks, but some of them will come into conflict if they can't be all fully achieved at the same time. Conflicts are resolved by casting all objectives to a common unit, and weighing these normalized objectives relative to each other. We also include configuration and velocity limits, making our overall optimization problem a quadratic program:
 
 $$
 \begin{align}
@@ -197,28 +231,6 @@ for t in np.arange(0.0, 42.0, dt):
 ```
 
 If task targets are continuously updated, there will be no stationary solution to converge to, but the model will keep on tracking each target at best. Note that [`solve_ik`](https://stephane-caron.github.io/pink/inverse-kinematics.html#pink.solve_ik.solve_ik) will take care of both configuration and velocity limits read from the robot model.
-
-## Examples
-
-Illustrated examples showcase how Pink performs on various robot morphologies:
-
-- Arm: [UR5](https://github.com/stephane-caron/pink/tree/main/examples#arm-ur5) and [UR5 with end-effector limits](https://github.com/stephane-caron/pink/tree/main/examples/barriers#arm-ur5)
-- Dual arms: [Flying dual-arm UR3](https://github.com/stephane-caron/pink/tree/main/examples#flying-dual-arm-ur3)
-- Dual arms: [Yumi with spherical self-collision avoidance](https://github.com/stephane-caron/pink/tree/main/examples/barriers#yumi-end-effector-self-collision-avoidance)
-- Dual arms: [Iiwa with whole-body self-collision avoidance](https://github.com/stephane-caron/pink/tree/main/examples/barriers#iiwa-whole-body-collision-avoidance)
-- Humanoid: [Draco 3](https://github.com/stephane-caron/pink/tree/main/examples#humanoid-draco-3)
-- Mobile base: [Stretch R1](https://github.com/stephane-caron/pink/tree/main/examples#mobile-stretch)
-- Quadruped: [Go2 squatting with floating-base limits](https://github.com/stephane-caron/pink/tree/main/examples/barriers#go2-squat)
-- Wheeled biped: [Upkie rolling without slipping](https://github.com/stephane-caron/pink/tree/main/examples#wheeled-biped-upkie)
-
-There are also more basic examples to get started:
-
-- [Double pendulum](https://github.com/stephane-caron/pink/blob/main/examples/double_pendulum.py)
-- [Loading a custom URDF](https://github.com/stephane-caron/pink/blob/main/examples/load_custom_urdf.py)
-- [Visualization in MeshCat](https://github.com/stephane-caron/pink/blob/main/examples/visualize_in_meshcat.py)
-- [Visualization in yourdfpy](https://github.com/stephane-caron/pink/blob/main/examples/visualize_in_yourdfpy.py)
-
-Check out the [examples](https://github.com/stephane-caron/pink/tree/main/examples) directory for more.
 
 
 ## Description
