@@ -1,16 +1,18 @@
 # Inverse Kinematic (IK) Tutorial
 
-A tutorial for Inverse Kinematics (IK) using Pinocchio and QP solvers. 
+A tutorial for Inverse Kinematics (IK) using Pink and Mink. 
 
-## Pink
-In this tutorial, we will go through Pink IK software. The version of Pink used here is 3.5.0.
+# Pink
+In this tutorial, we will go through Pink and Mink IK software. The version of Pink used here is 3.5.0 and for Mink, that's 1.0.0.
 
-**P**ython **in**verse **k**inematics for articulated robot models, based on [Pinocchio](https://github.com/stack-of-tasks/pinocchio).
+**P**ython **in**verse **k**inematics for articulated robot models, based on [Pinocchio](https://github.com/stack-of-tasks/pinocchio) and QP Solvers.
 
-![Banner for Pink v0.5.0](https://user-images.githubusercontent.com/1189580/192318997-ed7574c3-8238-451d-9548-a769d46ec03b.png)
+<div align="center">
+  <img src="media/ik_solver.png" width="600">
+</div>
 
 ## Requirements
-This work was performed on ubuntu 22.04, Cuda 12.8, Python 3.10, Nvidia RTX 3060 and Pink 3.5.0.
+This work was performed on ubuntu 22.04, Cuda 12.8, Python 3.10, Nvidia RTX 3060, Pink 3.5.0 and mink 1.0.0.
 
 ## Clone the repo
 Clone the repo using the following command:
@@ -60,6 +62,44 @@ python3 arm_ur3.py
 <div align="center">
   <img src="media/ur3_ik.png" width="400">
 </div>
+
+# Mink
+**M**ujoco **in**verse **k**inematics for articulated robot models, based on Mujoco physics engine. Mink is running Pink under the hood.
+
+<div align="center">
+  <img src="media/mink_banner.png" width="600">
+</div>
+
+## Installation
+Create a uv virtual environment and Install mink:
+```
+cd ~/IK-Tutorial
+uv venv --python 3.10 mink_venv
+source mink_venv/bin/activate
+cd mink
+uv sync --active
+```
+
+## Example
+Run the UR5 Arms:
+```
+uv run examples/arm_ur5e.py
+```
+
+<div align="center">
+  <img src="media/ik_ur5.gif" width="400">
+</div>
+
+Run the Apollo Humanoid:
+```
+uv run examples/humanoid_apollo.py
+```
+
+<div align="center">
+  <img src="media/ik_apollo.gif" width="400">
+</div>
+
+You will find the other demos inside `examples` folder.
 
 ## Usage
 
@@ -398,23 +438,4 @@ Thirty-five years ago (**Richard, 1981**), “inverse kinematics” was defined 
 ## Global inverse kinematics
 
 Pink implements differential inverse kinematics, a first-order algorithm that converges to the closest optimum of its cost function. It is a **local** method that does not solve the more difficult problem of [global inverse kinematics](https://github.com/stephane-caron/pink/discussions/66). That is, it may converge to a global optimum, or to a local one stuck to some configuration limits. This behavior is illustrated in the [simple pendulum with configuration limit](https://github.com/stephane-caron/pink/blob/main/examples/simple_pendulum_configuration_limit.py) example.
-
-
-Don't forget to add yourself to the BibTeX above and to `CITATION.cff` if you contribute to this repository.
-
-## See also
-
-Software:
-
-- [mink](https://github.com/kevinzakka/mink): differential inverse kinematics in Python, based on the MuJoCo physics engine.
-- [Jink.jl](https://github.com/adubredu/Jink.jl): Julia package for differential multi-task inverse kinematics.
-- [PlaCo](https://github.com/rhoban/placo): C++ inverse kinematics based on Pinocchio.
-- [pymanoid](https://github.com/stephane-caron/pymanoid): precursor to Pink based on OpenRAVE.
-- [TSID](https://github.com/stack-of-tasks/tsid): C++ inverse kinematics based on Pinocchio.
-
-Technical notes:
-
-- [Inverse kinematics](https://scaron.info/robotics/inverse-kinematics.html): a general introduction to differential inverse kinematics.
-- [Jacobian of a kinematic task and derivatives on manifolds](https://scaron.info/robotics/jacobian-of-a-kinematic-task-and-derivatives-on-manifolds.html).
-- [Control Barrier Functions](https://simeon-ned.com/blog/2024/cbf/).
 
