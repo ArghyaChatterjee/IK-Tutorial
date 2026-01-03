@@ -452,3 +452,11 @@ Thirty-five years ago (**Richard, 1981**), “inverse kinematics” was defined 
 
 Pink implements differential inverse kinematics, a first-order algorithm that converges to the closest optimum of its cost function. It is a **local** method that does not solve the more difficult problem of [global inverse kinematics](https://github.com/stephane-caron/pink/discussions/66). That is, it may converge to a global optimum, or to a local one stuck to some configuration limits. This behavior is illustrated in the [simple pendulum with configuration limit](./pink/examples/simple_pendulum_configuration_limit.py) example.
 
+## Other IK Softwares
+- [Jink.jl](https://github.com/adubredu/Jink.jl): Julia package for differential multi-task inverse kinematics.
+- [PlaCo](https://github.com/rhoban/placo): C++ inverse kinematics based on Pinocchio.
+- [pymanoid](https://github.com/stephane-caron/pymanoid): precursor to Pink based on OpenRAVE.
+- [TSID](https://github.com/stack-of-tasks/tsid): C++ inverse kinematics based on Pinocchio.
+- [BIO-IK](https://github.com/TAMS-Group/bio_ik)
+- [Pick-IK](https://github.com/pickNikRobotics/pick_ik)
+
